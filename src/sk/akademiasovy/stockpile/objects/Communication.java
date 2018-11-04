@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import okhttp3.*;
 
 import java.io.IOException;
+import java.util.List;
 
 public class Communication {
 
@@ -12,7 +13,7 @@ public class Communication {
 
         MediaType mediaType = MediaType.parse("application/json");
         RequestBody body = RequestBody.create(mediaType, "{\n\t\"username\":\""+username+"\",\n\t\"password\":\""+password+"\"\n}");
-        System.out.println(body);
+        //System.out.println(body);
         Request request = new Request.Builder()
                 .url("http://itsovy.sk:3311/login")
                 .post(body)
@@ -23,7 +24,7 @@ public class Communication {
         try {
             Response response = client.newCall(request).execute();
             Gson gson = new Gson();
-            AuthResponse authResponse = gson.fromJson(String.valueOf(response),AuthResponse.class);
+            AuthResponse authResponse = gson.fromJson(response.body().string(),AuthResponse.class);
             if (authResponse.getToken().equals("")){
                 return "";
             } else {
@@ -50,7 +51,12 @@ public class Communication {
         try {
             Response response = client.newCall(request).execute();
             Gson gson = new Gson();
-            StockList output = gson.fromJson(String.valueOf(response),StockList.class);
+            System.out.println(response.body());
+            StockList output = gson.fromJson(response.body().string(),StockList.class);
+            List<StockUnit> list = output.getStockUnits();
+            for (StockUnit element: list) {
+                System.out.println(element.toString());
+            }
             return output;
         } catch (
                 IOException e1) {
@@ -59,11 +65,12 @@ public class Communication {
         }
     }
 
-    public boolean insertItem(StockUnit item){
+    public boolean insertItem(StockUnit item, String token){
         OkHttpClient client = new OkHttpClient();
 
         MediaType mediaType = MediaType.parse("application/json");
         RequestBody body = RequestBody.create(mediaType, "{\n\t\"name\":\""+item.getName()+"\"," +
+                "\n\t\"token\":\""+token+"\"," +
                 "\n\t\"origin\":\""+item.getOrigin()+"\"," +
                 "\n\t\"quantity\":"+item.getQuantity()+"," +
                 "\n\t\"recipient\":\""+item.getRecipient()+"\"" +
@@ -99,7 +106,7 @@ public class Communication {
                 "\n\t\"recipient\":\""+item.getRecipient()+"\"" +
                 "\n}");
         Request request = new Request.Builder()
-                .url("http://itsovy.sk:3311/withdraw")
+                .url("http://itsovy.sk:3311/remove")
                 .post(body)
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Cache-Control", "no-cache")
@@ -116,6 +123,26 @@ public class Communication {
                 IOException e1) {
             e1.printStackTrace();
             return false;
+        }
+    }
+
+    public static final MediaType JSON
+            = MediaType.parse("application/json; charset=utf-8");
+
+    private OkHttpClient client = new OkHttpClient();
+
+    public String post(String url, String json) throws IOException {
+        RequestBody body = RequestBody.create(JSON, json);
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+        try (Response response = client.newCall(request).execute()) {
+            if (response.code() != 200)
+            {
+                return null;
+            }
+            return response.body().string();
         }
     }
 

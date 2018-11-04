@@ -1,22 +1,23 @@
 package sk.akademiasovy.stockpile.objects;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class StockList {
-    private List<StockUnit> stockunits;
+    private LinkedList<StockUnit> stockunits;
 
     public StockList() {
     }
 
-    public StockList(List<StockUnit> stockUnits) {
+    public StockList(LinkedList<StockUnit> stockUnits) {
         this.stockunits = stockUnits;
     }
 
-    public List<StockUnit> getStockUnits() {
+    public LinkedList<StockUnit> getStockUnits() {
         return stockunits;
     }
 
-    public void setStockUnits(List<StockUnit> stockUnits) {
+    public void setStockUnits(LinkedList<StockUnit> stockUnits) {
         this.stockunits = stockUnits;
     }
 }
