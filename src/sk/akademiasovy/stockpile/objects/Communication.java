@@ -65,7 +65,7 @@ public class Communication {
         MediaType mediaType = MediaType.parse("application/json");
         RequestBody body = RequestBody.create(mediaType, "{\n\t\"name\":\""+item.getName()+"\"," +
                 "\n\t\"origin\":\""+item.getOrigin()+"\"," +
-                "\n\t\"quantity\":\""+item.getQuantity()+"\"," +
+                "\n\t\"quantity\":"+item.getQuantity()+"," +
                 "\n\t\"recipient\":\""+item.getRecipient()+"\"" +
                 "\n}");
         Request request = new Request.Builder()
