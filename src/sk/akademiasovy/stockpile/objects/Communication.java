@@ -37,32 +37,34 @@ public class Communication {
         }
     }
 
-    public StockList getUpdate(String token){
+    public Stockunits getUpdate(String token){
         OkHttpClient client = new OkHttpClient();
 
         MediaType mediaType = MediaType.parse("application/json");
-        RequestBody body = RequestBody.create(mediaType, "{\n\t\"token\":\""+token+"\"\n}");
-        Request request = new Request.Builder()
-                .url("http://itsovy.sk:3311/update")
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Cache-Control", "no-cache")
-                .build();
+        String req = "{\n\t\"token\":\""+token+"\"\n}";
+        System.out.println(req);
+        //RequestBody body = RequestBody.create(mediaType, req);
+        //Request request = new Request.Builder()
+        //        .url("http://itsovy.sk:3311/update")
+        //        .post(body)
+        //        .addHeader("Content-Type", "application/json")
+         //       .addHeader("Cache-Control", "no-cache")
+         //       .build();
 
+        String response = null;
         try {
-            Response response = client.newCall(request).execute();
-            Gson gson = new Gson();
-            System.out.println(response.body());
-            StockList output = gson.fromJson(response.body().string(),StockList.class);
-            List<StockUnit> list = output.getStockUnits();
-            for (StockUnit element: list) {
-                System.out.println(element.toString());
-            }
-            return output;
-        } catch (
-                IOException e1) {
-            e1.printStackTrace();
-            return null;
+            response = post("http://itsovy.sk:3311/update",req);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        Gson gson = new Gson();
+        System.out.println(response);
+        Stockunits output = gson.fromJson(response, Stockunits.class);
+        //List<StockUnit> list = output.getStockUnits();
+        for (StockUnit element: output.getStockUnits()) {
+            System.out.println(element.toString());
+        }
+        return output;
     }
 
     public boolean insertItem(StockUnit item, String token){
@@ -96,13 +98,14 @@ public class Communication {
         }
     }
 
-    public boolean withdrawItem(StockUnit item){
+    public boolean withdrawItem(StockUnit item, String token){
         OkHttpClient client = new OkHttpClient();
-
+        System.out.println("Removed");
         MediaType mediaType = MediaType.parse("application/json");
         RequestBody body = RequestBody.create(mediaType, "{\n\t\"name\":\""+item.getName()+"\"," +
+                "\n\t\"token\":\""+token+"\"," +
                 "\n\t\"origin\":\""+item.getOrigin()+"\"," +
-                "\n\t\"quantity\":\""+item.getQuantity()+"\"," +
+                "\n\t\"quantity\":"+item.getQuantity()+"," +
                 "\n\t\"recipient\":\""+item.getRecipient()+"\"" +
                 "\n}");
         Request request = new Request.Builder()
@@ -143,6 +146,9 @@ public class Communication {
                 return null;
             }
             return response.body().string();
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
         }
     }
 

@@ -2,20 +2,20 @@ package sk.akademiasovy.stockpile.objects;
 
 public class StockUnit {
     private String name;
-    private Integer quantity;
+    private String quantity;
     private String recipient;
     private String origin;
 
     public StockUnit() {
     }
 
-    public StockUnit(String name, Integer quantity, String origin) {
+    public StockUnit(String name, String quantity, String origin) {
         this.name = name;
         this.quantity = quantity;
         this.origin = origin;
     }
 
-    public StockUnit(String name, Integer quantity, String recipient, String origin) {
+    public StockUnit(String name, String quantity, String recipient, String origin) {
         this.name = name;
         this.quantity = quantity;
         this.recipient = recipient;
@@ -30,11 +30,11 @@ public class StockUnit {
         this.name = name;
     }
 
-    public Integer getQuantity() {
+    public String getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(String quantity) {
         this.quantity = quantity;
     }
 

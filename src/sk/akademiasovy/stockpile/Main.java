@@ -1,6 +1,5 @@
 package sk.akademiasovy.stockpile;
 
-import okhttp3.*;
 import sk.akademiasovy.stockpile.objects.*;
 
 import javax.swing.*;
@@ -8,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Main {
-    static StockList stockList = new StockList();
+    static Stockunits stockunits = new Stockunits();
     static String tokenfinal = "";
     static JComboBox comboBox = new JComboBox();
     public static void main(String[] args) {
@@ -19,7 +18,7 @@ public class Main {
         StockManipulator manipulator = new StockManipulator();
 
         JFrame maiFrame=new JFrame("Stock Management");
-        maiFrame.setSize(600,600);
+        maiFrame.setSize(600,350);
 
         // CREATE elements
 
@@ -63,23 +62,25 @@ public class Main {
                     loginButton.enable();
                     errorLabel.setText("Communication error");
                 } else {
-                    stockList = new StockList(communication.getUpdate(tokenfinal).getStockUnits()) ;
+                    stockunits = communication.getUpdate(tokenfinal) ;
                     loginButton.disable();
                     insertButton.enable();
                     removeButton.enable();
                     searchNameButton.enable();
                     searchRecipientButton.enable();
                     errorLabel.setText("");
-                    List<String> list = new LinkedList<>();
-                    for (StockUnit element: stockList.getStockUnits()) {
-                        list.add(element.toString());
-                    }
-                    comboBox = new JComboBox((ComboBoxModel) list);
-                    maiFrame.add(comboBox);
+
                 }
             }
         });
         maiFrame.add(loginButton);
+
+        JLabel lableremoveQuantity = new JLabel("Quantity:");
+        JTextField removeQuantity = new JTextField();
+        JLabel lableremoveOrigin = new JLabel("origin:");
+        JTextField removeOrigin = new JTextField();
+        JLabel lableremoveRecipient = new JLabel("ecipient:");
+        JTextField removeRecipient = new JTextField();
 
         JTextField newinsertName = new JTextField();
         newinsertName.setBounds(20,100,150,20);
@@ -120,7 +121,7 @@ public class Main {
             newSwap.setName(newinsertName.getText().trim());
             newSwap.setRecipient(newinsertRecipient.getText().trim());
             newSwap.setOrigin(newinsertOrigin.getText().trim());
-            newSwap.setQuantity(Integer.valueOf(newinsertQuantity.getText().trim()));
+            newSwap.setQuantity(newinsertQuantity.getText().trim());
             if (communication.insertItem(newSwap,tokenfinal)){
                 errorLabel.setText("");
                 newinsertName.setText("");
@@ -135,6 +136,9 @@ public class Main {
         insertButton.disable();
         maiFrame.add(insertButton);
 
+        JButton remove = new JButton("Remove");
+        remove.enable(false);
+
 
         JTextField searchName = new JTextField();
         searchName.setBounds(300,100,150,20);
@@ -146,11 +150,55 @@ public class Main {
 
         searchNameButton.setBounds(455,100,100,20);
         searchNameButton.addActionListener(e -> {
-
+            StockUnit found = filter.findByname(stockunits,searchName.getText().trim());
+            removeOrigin.setText(found.getOrigin());
+            removeQuantity.setText(found.getQuantity());
+            removeRecipient.setText(found.getRecipient());
+            remove.enable(true);
         });
         maiFrame.add(searchNameButton);
 
-        comboBox.setBounds(200,150,300,22);
+
+
+        //comboBox.setBounds(200,150,300,22);
+
+
+        removeRecipient.setBounds(300,145,150,20);
+        removeRecipient.disable();
+        maiFrame.add(removeRecipient);
+
+
+        lableremoveRecipient.setBounds(300,125,150,20);
+        maiFrame.add(lableremoveRecipient);
+
+
+        removeOrigin.disable();
+        removeOrigin.setBounds(300,185,150,20);
+        maiFrame.add(removeOrigin);
+
+
+        lableremoveOrigin.setBounds(300,165,150,20);
+        maiFrame.add(lableremoveOrigin);
+
+
+        removeQuantity.disable();
+        removeQuantity.setBounds(300,225,150,20);
+        maiFrame.add(removeQuantity);
+
+
+        lableremoveQuantity.setBounds(300,205,150,20);
+        maiFrame.add(lableremoveQuantity);
+
+        remove.setBounds(300,250,100,20);
+        remove.addActionListener(e -> {
+            communication.withdrawItem(filter.findByname(stockunits,searchName.getText().trim()),tokenfinal);
+            searchName.setText("");
+            removeOrigin.setText("");
+            removeQuantity.setText("");
+            removeRecipient.setText("");
+        });
+        maiFrame.add(remove);
+
 
 
 
